@@ -4,10 +4,12 @@ import entities.SimulationRun;
 
 import utils.MapUtils;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,17 +32,43 @@ public class Main {
 
         System.out.println("SimulationRun Details");
 
-        for  (int j = simulationRun.lawn.height - 1; j >= 0; --j){
+        simulationRun.lawn.DisplayStateInformationOfSquares();
 
-            for (int i = 0; i < simulationRun.lawn.width; ++i) {
 
-                System.out.print(simulationRun.lawn.squares[i][j].description+ "["+i+"]"+"["+j+"]"+" ");
-            }
-            System.out.println();
+        System.out.println();
+        System.out.println(simulationRun.lawn.totalGrassSquares);
+
+        System.out.println();
+
+        List<Point> otherMowers = new ArrayList<Point>();
+        otherMowers.add(simulationRun.lawn.mowers.get(1).coordinate);
+
+
+        System.out.println(simulationRun.lawn.mowers.get(0).Scan(simulationRun.lawn.squares,otherMowers));
+
+
+        System.out.println(simulationRun.lawn.mowers.get(0).Pass());
+
+        //move to 1,2
+
+        //System.out.println(simulationRun.lawn.mowers.get(0).Move(new Point(1,2),"mower"));
+        System.out.println(simulationRun.lawn.MowerTakeAction(0,"move",new Point(1,2)));
+
+        System.out.println("SimulationRun Details");
+
+        simulationRun.lawn.DisplayStateInformationOfSquares();
+
+        for(int i = 0; i<simulationRun.lawn.strategies.size() ; i++){
+            System.out.println(i);
         }
 
-        System.out.println(simulationRun.lawn.totalGrassSquares);
-        simulationRun.lawn.mowers.get(0).Scan(simulationRun.lawn.squares);
+
+
+
+
+
+
+
 
 
 

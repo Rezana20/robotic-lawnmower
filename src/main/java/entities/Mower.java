@@ -13,6 +13,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Mower {
+
+    public String mowerId;
     public Point coordinate;
     public boolean hasCrashed = false;
     public Direction currentDirection;
@@ -20,58 +22,76 @@ public class Mower {
     public Point startCoordinate;
     public List<Direction> previousDirections;
 
-    public Strategy strategy;
 
-    public Mower(Point startCoordinate, Direction direction, int strategy) {
+    private String mowerStatus = "ok";
+
+    public Mower(String mowerId, Point startCoordinate, Direction direction) {
+
+        this.mowerId = mowerId;
         this.startCoordinate = startCoordinate;
         this.coordinate = startCoordinate;
         this.currentDirection = direction;
 
-        if (strategy == 0) {
-            this.strategy = Strategy.RANDOM;
-        } else {
-            this.strategy = Strategy.CUSTOM;
+    }
+
+
+    public String Move(Point newCoordinate, String newSquareDetail) {
+
+        this.coordinate = newCoordinate;
+
+        if(validateMove(newSquareDetail)) {
+            UpdateHasCrashed();
         }
 
-
+        return mowerId+",move \n"+mowerStatus;
     }
 
+    private boolean validateMove(String newSquareDetail){
 
-    public void Move(Direction direction, Point newCoordinate) {
-        AddToPreviousDirections();
+        return newSquareDetail == "fence" || newSquareDetail == "mower" || newSquareDetail == "crater";
+    }
+
+    public String Steer(Direction direction) {
+
         UpdateCurrentDirection(direction);
-        this.coordinate = newCoordinate;
+        return mowerId+",steer,"+direction.name();
+
     }
 
-    public void Steer(Direction direction) {
-        currentDirection = direction;
-    }
-
-    //TODO identify mower cells  - right now they will be empty
-    public void Scan(Square[][] squares) {
+  public String Scan(Square[][] squares, List<Point> otherMowers) {
         String neighbors = "";
 
         int[] x = {0, 1, 1, 1, 0, -1, -1, -1};
         int[] y = {1, 1, 0, -1, -1, -1, 0, 1};
 
         for (int k = 0; k < 8; k++) {
+
             if (isValid(coordinate.x + x[k], coordinate.y + y[k], squares.length)) {
-                neighbors += squares[coordinate.x + x[k]][coordinate.y + y[k]].description + ", ";
+
+                Point currentPoint = new Point(coordinate.x + x[k], coordinate.y + y[k]);
+                if(otherMowers.contains(currentPoint)) {
+                    neighbors += "mower, ";
+                }
+                else {
+                    neighbors += squares[coordinate.x + x[k]][coordinate.y + y[k]].toString() + ", ";
+                }
+
             } else {
                 neighbors += "fence, ";
             }
         }
 
-        System.out.println(neighbors.substring(0, neighbors.length() - 2));
+        return mowerId+",scan \n"+neighbors.substring(0, neighbors.length() - 2);
 
     }
 
 
-    public void Pass() {
-
+    public String Pass() {
+        return mowerId+",pass \nok";
     }
 
     public void Cut() {
+
 
     }
 
@@ -82,6 +102,8 @@ public class Mower {
 
     public void UpdateHasCrashed() {
         hasCrashed = true;
+        mowerStatus = "crash";
+
     }
 
     private void AddToPreviousDirections() {
@@ -89,6 +111,7 @@ public class Mower {
     }
 
     private void UpdateCurrentDirection(Direction direction) {
+        AddToPreviousDirections();
         this.currentDirection = direction;
     }
 

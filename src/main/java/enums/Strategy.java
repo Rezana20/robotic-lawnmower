@@ -1,15 +1,35 @@
 package enums;
 
+import com.sun.org.apache.xerces.internal.xs.StringList;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public enum Strategy {
-    RANDOM(0),
-    CUSTOM(1);
+    random("0"),
+    custom("1");
 
-    public int stratCode;
+    public String strategyType;
 
-    Strategy(int stratCode) {
-        this.stratCode = stratCode;
+    Strategy(String code) {
+        this.strategyType = code;
     }
 
+    public String getCode() {
+        return this.strategyType;
+    }
+
+    private static final Map<String,Strategy> lookup = new HashMap<>();
+
+    static {
+        for (Strategy strat: Strategy.values()) {
+            lookup.put(strat.getCode(), strat);
+        }
+    }
+
+    public static Strategy get(String code) {
+        return lookup.get(code);
+    }
 
 
 }
