@@ -9,41 +9,46 @@ import java.util.List;
 
 @Data
 public class Lawn {
+
     public int height;
     public int width;
     public Square[][] squares;
-    public List<Mower> Mowers;
-    public List<Crater> Craters;
+    public List<Mower> mowers;
+    public List<Crater> craters;
+    public int totalGrassSquares = 0;
+    public boolean allGrassCut;
 
-    public Lawn() {
-        this.Mowers = new ArrayList<Mower>();
-        this.Craters = new ArrayList<Crater>();
-    }
 
-    public Lawn(int height, int width) {
-        height = height;
-        width = width;
-        squares = new Square[height][width];
+    public Lawn(int height, int width, List<Mower> mowers, List<Crater> craters) {
+        this.height = height;
+        this.width = width;
+        this.squares = new Square[width][height];
+        this.mowers = mowers;
+        this.craters = craters;
+        BuildSquares();
     }
 
     private void BuildSquares() {
-      //refactor to enum type in square
-        for (Mower mower: Mowers) {
-            Point startLocation = mower.startLocation;
-            squares[startLocation.x][startLocation.y] = new Empty(startLocation);
+        //refactor to enum type in square
+        for (Mower mower : mowers) {
+            Point coordinate = mower.startCoordinate;
+            squares[coordinate.x][coordinate.y] = new Empty(coordinate);
         }
 
-        for (Crater crater: Craters) {
-            Point location = crater.coordinate;
-            squares[location.x][location.y] = new Crater(location);
+        for (Crater crater : craters) {
+            Point coordinate = crater.coordinate;
+            squares[coordinate.x][coordinate.y] = new Crater(coordinate);
         }
 
-        for (int i = 0; i < height ; i++) {
+        for (int i = 0; i < width; ++i) {
 
-            for (int j = 0; j < width ; j++) {
+            for (int j = 0; j < height; ++j) {
 
-                if (squares[i][j]  == null) {
-                    squares[i][j] = new Grass(new Point(i,j));
+                if (squares[i][j] == null) {
+                    Point newPoint = new Point(i,j);
+                    Grass newGrass = new Grass(newPoint);
+                    squares[i][j] = newGrass;
+                    totalGrassSquares++;
                 }
 
             }
@@ -53,11 +58,11 @@ public class Lawn {
     }
 
     public void UpdateMowerCrashStatus(int MowerID) {
-        Mowers.get(MowerID).UpdateHasCrashed();
+        mowers.get(MowerID).UpdateHasCrashed();
     }
 
     public void MowerTakeAction(int MowerID) {
-        Mowers.get(MowerID).Move(Direction.north, new Point(0,0));
+        mowers.get(MowerID).Move(Direction.north, new Point(0, 0));
     }
 
 
@@ -71,7 +76,17 @@ public class Lawn {
     }
 
     public void MarkGrassAsCut(int MowerID) {
-        Mowers.get(MowerID).IncrementCutGrassSquare();
+        mowers.get(MowerID).IncrementCutGrassSquare();
+    }
+
+    public boolean CountAllGrassCut() {
+        int currentCutSquares = 0;
+
+        for(Mower mower: mowers){
+            currentCutSquares += mower.countCutGrass;
+        }
+
+        return currentCutSquares == totalGrassSquares;
     }
 
 

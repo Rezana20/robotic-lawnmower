@@ -5,27 +5,18 @@ import java.awt.Point;
 public class Square {
 
     public Point coordinate;
-    public String type;
-
-    public Square(Point Coordinate){
-        coordinate = Coordinate;
-        type = "Square";
-    }
-
-
-    public void changeType(String newType) {
-        this.type = newType;
-    }
+    public String description = "square";
 
     public Square() {
 
     }
 
+    public Square(Point coordinate) {
+        this.coordinate = coordinate;
+    }
+
     @Override
     public String toString() {
-        return "Square{" +
-                "coordinate=" + coordinate +
-                ", type='" + type + '\'' +
-                '}';
+        return description;
     }
 }

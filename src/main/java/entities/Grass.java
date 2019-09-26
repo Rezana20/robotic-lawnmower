@@ -1,15 +1,13 @@
 package entities;
-import java.awt.*;
+
+        import java.awt.Point;
 
 public class Grass extends Square {
 
-    public boolean IsCut;
-    public String type;
-
-
-    public Grass(Point Coordinate) {
-        super(Coordinate);
-        type = "grass";
+    public Grass(Point coordinate) {
+        super(coordinate);
+        description = "grass";
     }
+
 
 }

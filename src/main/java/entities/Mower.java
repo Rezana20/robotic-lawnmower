@@ -1,6 +1,7 @@
 package entities;
 
 import java.awt.Point;
+
 import enums.Direction;
 import enums.Strategy;
 import lombok.Data;
@@ -9,25 +10,26 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data @NoArgsConstructor
+@Data
+@NoArgsConstructor
 public class Mower {
-    public Point location;
+    public Point coordinate;
     public boolean hasCrashed = false;
     public Direction currentDirection;
     public int countCutGrass = 0;
-    public Point startLocation;
+    public Point startCoordinate;
     public List<Direction> previousDirections;
 
     public Strategy strategy;
 
-    public Mower(Point startLocation, Direction direction, int strategy) {
-        this.startLocation = startLocation;
-        this.location = startLocation;
+    public Mower(Point startCoordinate, Direction direction, int strategy) {
+        this.startCoordinate = startCoordinate;
+        this.coordinate = startCoordinate;
         this.currentDirection = direction;
-        if(strategy == 0 ) {
+
+        if (strategy == 0) {
             this.strategy = Strategy.RANDOM;
-        }
-        else {
+        } else {
             this.strategy = Strategy.CUSTOM;
         }
 
@@ -35,19 +37,35 @@ public class Mower {
     }
 
 
-    public void Move(Direction direction, Point location) {
+    public void Move(Direction direction, Point newCoordinate) {
         AddToPreviousDirections();
         UpdateCurrentDirection(direction);
-        this.location = location;
+        this.coordinate = newCoordinate;
     }
 
-    public void Steer() {
+    public void Steer(Direction direction) {
+        currentDirection = direction;
+    }
+
+    //TODO identify mower cells  - right now they will be empty
+    public void Scan(Square[][] squares) {
+        String neighbors = "";
+
+        int[] x = {0, 1, 1, 1, 0, -1, -1, -1};
+        int[] y = {1, 1, 0, -1, -1, -1, 0, 1};
+
+        for (int k = 0; k < 8; k++) {
+            if (isValid(coordinate.x + x[k], coordinate.y + y[k], squares.length)) {
+                neighbors += squares[coordinate.x + x[k]][coordinate.y + y[k]].description + ", ";
+            } else {
+                neighbors += "fence, ";
+            }
+        }
+
+        System.out.println(neighbors.substring(0, neighbors.length() - 2));
 
     }
 
-    public void Scan() {
-
-    }
 
     public void Pass() {
 
@@ -58,16 +76,15 @@ public class Mower {
     }
 
     public void Display() {
-        System.out.println("Cut: "+countCutGrass);
+        System.out.println("Cut: " + countCutGrass);
     }
-
 
 
     public void UpdateHasCrashed() {
         hasCrashed = true;
     }
 
-    private void AddToPreviousDirections(){
+    private void AddToPreviousDirections() {
         this.previousDirections.add(currentDirection);
     }
 
@@ -76,6 +93,12 @@ public class Mower {
     }
 
     public void IncrementCutGrassSquare() {
-     this.countCutGrass++;
+        this.countCutGrass++;
+    }
+
+    private boolean isValid(int x, int y, int len) {
+        if (x < 0 || y < 0 || x >= len || y >= len)
+            return false;
+        return true;
     }
 }

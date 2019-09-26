@@ -1,6 +1,7 @@
 import action.Action;
+
 import entities.SimulationRun;
-import enums.Direction;
+
 import utils.MapUtils;
 
 import java.io.BufferedReader;
@@ -23,21 +24,34 @@ public class Main {
         }
 
 
-        list.forEach(System.out::println);
+        //list.forEach(System.out::println);
 
         SimulationRun simulationRun = new SimulationRun(list);
 
         System.out.println("SimulationRun Details");
-        System.out.println(simulationRun);
+
+        for  (int j = simulationRun.lawn.height - 1; j >= 0; --j){
+
+            for (int i = 0; i < simulationRun.lawn.width; ++i) {
+
+                System.out.print(simulationRun.lawn.squares[i][j].description+ "["+i+"]"+"["+j+"]"+" ");
+            }
+            System.out.println();
+        }
+
+        System.out.println(simulationRun.lawn.totalGrassSquares);
+        simulationRun.lawn.mowers.get(0).Scan(simulationRun.lawn.squares);
+
+
 
         //TODO: run a for loop to max turns or number of mowers that not yet crashed and compute action for each of them + evaluate
 
         //Propose action
         Action proposedAction = new Strategist(simulationRun).proposeAction();
-        System.out.println(proposedAction.render());
+        //System.out.println(proposedAction.render());
         //Evaluate action
         String actionOutcome = new MapUtils().evaluateAction(simulationRun, proposedAction);
-        System.out.println(actionOutcome);
+       // System.out.println(actionOutcome);
 
 
     }

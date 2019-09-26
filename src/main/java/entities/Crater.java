@@ -1,12 +1,11 @@
 package entities;
 
-import java.awt.*;
+import java.awt.Point;
 
 public class Crater extends Square {
-    public String type;
 
     public Crater(Point Coordinate) {
         super(Coordinate);
-        type = "crater";
+        description = "crater";
     }
 }

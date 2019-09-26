@@ -10,72 +10,123 @@ import java.util.List;
 
 @Data
 public class SimulationRun {
-    public int MaxTurns;
+    public int maxTurns;
     public List<String> fileInformation;
     public Lawn lawn;
+    public int countTurns = 0;
+    public int countMowerCrash = 0;
 
     public SimulationRun(List<String> file) {
         this.fileInformation = file;
         ProcessFileInformation();
-        RunSimulation();
+        RunSimulation(0);
 
 
     }
 
     private void ProcessFileInformation() {
 
-        lawn = new Lawn();
+        int width = Integer.parseInt(fileInformation.get(0));
 
-        lawn.width = Integer.parseInt(fileInformation.get(0));
-        lawn.height = Integer.parseInt(fileInformation.get(1));
+        int height = Integer.parseInt(fileInformation.get(1));
 
-        int num_mowers = Integer.parseInt(fileInformation.get(2));
+        int numMowers = Integer.parseInt(fileInformation.get(2));
+        ArrayList<Mower> mowers = new ArrayList<Mower>();
 
-        for (int i = 0; i < num_mowers; i++) {
+        for (int mower = 0; mower < numMowers; mower++) {
 
-            String[] line = fileInformation.get(i + 3).split(",");
-            Mower mower = new Mower(new Point(Integer.parseInt(line[0]),Integer.parseInt(line[1]))
+            String[] line = fileInformation.get(mower + 3).split(",");
+            Mower newMower = new Mower(new Point(Integer.parseInt(line[0]), Integer.parseInt(line[1]))
                     , Direction.valueOf(line[2]), Integer.parseInt(line[3]));
-           lawn.Mowers.add(mower);
-//            System.out.println(line);
+            mowers.add(newMower);
+
         }
 
 
-        int num_craters = Integer.parseInt(fileInformation.get(3 + num_mowers));
-//        System.out.println("craters: " + num_craters);
+        int numCraters = Integer.parseInt(fileInformation.get(3 + numMowers));
+        ArrayList<Crater> craters = new ArrayList<Crater>();
+        for (int crater = 0; crater < numCraters; crater++) {
 
-        for (int j = 0; j < num_craters; j++) {
-//
-            String[] line = fileInformation.get(4 + num_mowers + j).split(",");
+            String[] line = fileInformation.get(4 + numMowers + crater).split(",");
             Point point = new Point(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
-            lawn.Craters.add(new Crater(point));
+            Crater newCrater = new Crater(point);
+            craters.add(newCrater);
 
-//            System.out.println(line);
+
         }
+
+        lawn = new Lawn(height,width,mowers,craters);
+
         int max_turns = Integer.parseInt(fileInformation.get(fileInformation.size() - 1));
-        MaxTurns = max_turns;
+        maxTurns = max_turns;
 
 
     }
 
-    private void RunSimulation() {
+    private void RunSimulation(int mowerID) {
 
-        //Check strategy
+        if (!AllGrassCut() || !MaxTurnsReached() || !AllMowersCrashed()) {
+
+            if (lawn.mowers.get(mowerID).strategy == Strategy.RANDOM) {
+
+                RunRandomStrategy(mowerID);
+            } else {
+
+                RunMyStrategy(mowerID);
+
+            }
 
 
-        //while not halted  {
-        //
-        // Run rezana's strategy
-        // }
+        } else {
+            HaltSimulationRun();
+        }
 
-
-        //print report
 
     }
 
-    private void RunRandom() {
+    public void RunRandomStrategy(int mowerID) {
 
-        //logic given code
+
     }
+
+
+    public void RunMyStrategy(int mowerID) {
+    }
+
+
+    private void UpdateTurnCounter() {
+        countTurns++;
+    }
+
+    private void UpdateMowerCrashCounter() {
+        countMowerCrash++;
+    }
+
+    private boolean AllMowersCrashed() {
+        return countMowerCrash == lawn.mowers.size();
+    }
+
+    private boolean MaxTurnsReached() {
+        return countTurns == maxTurns;
+    }
+
+    private boolean AllGrassCut() {
+        return lawn.CountAllGrassCut();
+    }
+
+    public void HaltSimulationRun() {
+
+        int currentCutSquares = 0;
+
+        for (Mower mower : lawn.mowers) {
+            currentCutSquares += mower.countCutGrass;
+        }
+
+
+        Report report = new Report(lawn.Area(), lawn.totalGrassSquares, currentCutSquares, countTurns);
+        report.Display();
+
+    }
+
 
 }

@@ -1,12 +1,11 @@
 package entities;
 
-import java.awt.*;
+import java.awt.Point;
 
 public class Empty extends Square {
-    public String type;
 
-    public Empty(Point Coordinate) {
-        super(Coordinate);
-        type = "empty";
+    public Empty(Point coordinate) {
+        super(coordinate);
+        description = "empty";
     }
 }
