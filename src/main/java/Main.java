@@ -44,7 +44,7 @@ public class Main {
         otherMowers.add(simulationRun.lawn.mowers.get(1).coordinate);
 
 
-        System.out.println(simulationRun.lawn.mowers.get(0).Scan(simulationRun.lawn.squares,otherMowers));
+        System.out.println(simulationRun.lawn.mowers.get(0).Scan(simulationRun.lawn.squares, otherMowers));
 
 
         System.out.println(simulationRun.lawn.mowers.get(0).Pass());
@@ -52,24 +52,15 @@ public class Main {
         //move to 1,2
 
         //System.out.println(simulationRun.lawn.mowers.get(0).Move(new Point(1,2),"mower"));
-        System.out.println(simulationRun.lawn.MowerTakeAction(0,"move",new Point(1,2)));
+        System.out.println(simulationRun.lawn.MowerTakeAction(0, "move", new Point(1, 2)));
 
         System.out.println("SimulationRun Details");
 
         simulationRun.lawn.DisplayStateInformationOfSquares();
 
-        for(int i = 0; i<simulationRun.lawn.strategies.size() ; i++){
+        for (int i = 0; i < simulationRun.lawn.strategies.size(); i++) {
             System.out.println(i);
         }
-
-
-
-
-
-
-
-
-
 
 
         //TODO: run a for loop to max turns or number of mowers that not yet crashed and compute action for each of them + evaluate
@@ -79,7 +70,7 @@ public class Main {
         //System.out.println(proposedAction.render());
         //Evaluate action
         String actionOutcome = new MapUtils().evaluateAction(simulationRun, proposedAction);
-       // System.out.println(actionOutcome);
+        // System.out.println(actionOutcome);
 
 
     }

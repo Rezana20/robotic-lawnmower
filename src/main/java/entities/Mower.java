@@ -39,14 +39,14 @@ public class Mower {
 
         this.coordinate = newCoordinate;
 
-        if(validateMove(newSquareDetail)) {
+        if (validateMove(newSquareDetail)) {
             UpdateHasCrashed();
         }
 
-        return mowerId+",move \n"+mowerStatus;
+        return mowerId + ",move \n" + mowerStatus;
     }
 
-    private boolean validateMove(String newSquareDetail){
+    private boolean validateMove(String newSquareDetail) {
 
         return newSquareDetail == "fence" || newSquareDetail == "mower" || newSquareDetail == "crater";
     }
@@ -54,11 +54,11 @@ public class Mower {
     public String Steer(Direction direction) {
 
         UpdateCurrentDirection(direction);
-        return mowerId+",steer,"+direction.name();
+        return mowerId + ",steer," + direction.name();
 
     }
 
-  public String Scan(Square[][] squares, List<Point> otherMowers) {
+    public String Scan(Square[][] squares, List<Point> otherMowers) {
         String neighbors = "";
 
         int[] x = {0, 1, 1, 1, 0, -1, -1, -1};
@@ -69,10 +69,9 @@ public class Mower {
             if (isValid(coordinate.x + x[k], coordinate.y + y[k], squares.length)) {
 
                 Point currentPoint = new Point(coordinate.x + x[k], coordinate.y + y[k]);
-                if(otherMowers.contains(currentPoint)) {
+                if (otherMowers.contains(currentPoint)) {
                     neighbors += "mower, ";
-                }
-                else {
+                } else {
                     neighbors += squares[coordinate.x + x[k]][coordinate.y + y[k]].toString() + ", ";
                 }
 
@@ -81,13 +80,13 @@ public class Mower {
             }
         }
 
-        return mowerId+",scan \n"+neighbors.substring(0, neighbors.length() - 2);
+        return mowerId + ",scan \n" + neighbors.substring(0, neighbors.length() - 2);
 
     }
 
 
     public String Pass() {
-        return mowerId+",pass \nok";
+        return mowerId + ",pass \nok";
     }
 
     public void Cut() {

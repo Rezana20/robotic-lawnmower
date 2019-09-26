@@ -22,7 +22,7 @@ public class Lawn {
     public int crashedMowerCounter = 0;
 
 
-    public Lawn(int height, int width, List<Mower> mowers, List<Crater> craters,List<Strategy> strategies) {
+    public Lawn(int height, int width, List<Mower> mowers, List<Crater> craters, List<Strategy> strategies) {
         this.height = height;
         this.width = width;
         this.squares = new Square[width][height];
@@ -67,11 +67,11 @@ public class Lawn {
 
             for (int i = 0; i < width; ++i) {
 
-                Point currentPoint = new Point(i,j);
+                Point currentPoint = new Point(i, j);
                 boolean mowerPosition = false;
 
-                for(Mower m: mowers) {
-                    if(m.coordinate.equals(currentPoint)) {
+                for (Mower m : mowers) {
+                    if (m.coordinate.equals(currentPoint)) {
                         mowerPosition = true;
                         break;
                     }
@@ -86,7 +86,7 @@ public class Lawn {
         }
     }
 
-    //TODO add more details here to make a move
+    //TODO add more details here to make a move - may do this on simulation
     public String MowerTakeAction(int MowerID, String mowerAction, Point newPoint) {
 
         switch (mowerAction) {

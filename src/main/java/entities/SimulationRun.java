@@ -37,7 +37,7 @@ public class SimulationRun {
         for (int mower = 0; mower < numMowers; mower++) {
 
             String[] line = fileInformation.get(mower + 3).split(",");
-            Mower newMower = new Mower("m"+mower ,new Point(Integer.parseInt(line[0]), Integer.parseInt(line[1]))
+            Mower newMower = new Mower("m" + mower, new Point(Integer.parseInt(line[0]), Integer.parseInt(line[1]))
                     , Direction.valueOf(line[2]));
             mowers.add(newMower);
             strategies.add(Strategy.get((line[3])));
@@ -55,7 +55,7 @@ public class SimulationRun {
 
         }
 
-        lawn = new Lawn(height,width,mowers,craters,strategies);
+        lawn = new Lawn(height, width, mowers, craters, strategies);
 
         int max_turns = Integer.parseInt(fileInformation.get(fileInformation.size() - 1));
         maxTurns = max_turns;
@@ -66,29 +66,26 @@ public class SimulationRun {
     private void RunSimulation() {
 
 
-
-
         while (MaxTurnsReached() || AllMowersCrashed() || AllGrassCut()) {
 
-            for(int i = 0; i < lawn.mowers.size(); i++) {
+            for (int i = 0; i < lawn.mowers.size(); i++) {
                 UpdateTurnCounter();
                 //lawn.mowers.get(i).hasCrashed = true;
-                if(false) {
-                //if(!lawn.mowers.get(i).hasCrashed) {
+                if (false) {
+                    //if(!lawn.mowers.get(i).hasCrashed) {
                     Strategy strat = lawn.strategies.get(i);
 
 
-                    if(strat == Strategy.random) {
+                    if (strat == Strategy.random) {
 
                         //make a random move
-                        if(AllGrassCut() || MaxTurnsReached() || AllMowersCrashed()) {
+                        if (AllGrassCut() || MaxTurnsReached() || AllMowersCrashed()) {
                             break;
                         }
-                    }
-                    else {
+                    } else {
 
                         //make a strategic move
-                        if(AllGrassCut() || MaxTurnsReached() || AllMowersCrashed()) {
+                        if (AllGrassCut() || MaxTurnsReached() || AllMowersCrashed()) {
                             break;
                         }
 
@@ -98,9 +95,10 @@ public class SimulationRun {
 
 
         }
-            HaltSimulationRun();
 
-        //TODO build the report
+        HaltSimulationRun();
+
+
     }
 
     public void RunRandomStrategy(int mowerID) {
@@ -138,8 +136,6 @@ public class SimulationRun {
         for (Mower mower : lawn.mowers) {
             currentCutSquares += mower.countCutGrass;
         }
-
-
         Report report = new Report(lawn.Area(), lawn.totalGrassSquares, currentCutSquares, countTurns);
         report.Display();
 

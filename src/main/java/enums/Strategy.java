@@ -19,10 +19,10 @@ public enum Strategy {
         return this.strategyType;
     }
 
-    private static final Map<String,Strategy> lookup = new HashMap<>();
+    private static final Map<String, Strategy> lookup = new HashMap<>();
 
     static {
-        for (Strategy strat: Strategy.values()) {
+        for (Strategy strat : Strategy.values()) {
             lookup.put(strat.getCode(), strat);
         }
     }
