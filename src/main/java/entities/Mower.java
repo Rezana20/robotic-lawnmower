@@ -21,8 +21,6 @@ public class Mower {
     public int countCutGrass = 0;
     public Point startCoordinate;
     public List<Direction> previousDirections;
-
-
     private String mowerStatus = "ok";
 
     public Mower(String mowerId, Point startCoordinate, Direction direction) {
@@ -32,12 +30,17 @@ public class Mower {
         this.coordinate = startCoordinate;
         this.currentDirection = direction;
 
-    }
+        this.previousDirections = new ArrayList<>();
 
+    }
 
     public String Move(Point newCoordinate, String newSquareDetail) {
 
         this.coordinate = newCoordinate;
+
+        if(newSquareDetail.equals("grass")) {
+            IncrementCutGrassSquare();
+        }
 
         if (validateMove(newSquareDetail)) {
             UpdateHasCrashed();
@@ -46,15 +49,10 @@ public class Mower {
         return mowerId + ",move \n" + mowerStatus;
     }
 
-    private boolean validateMove(String newSquareDetail) {
-
-        return newSquareDetail == "fence" || newSquareDetail == "mower" || newSquareDetail == "crater";
-    }
-
     public String Steer(Direction direction) {
 
         UpdateCurrentDirection(direction);
-        return mowerId + ",steer," + direction.name();
+        return mowerId + ",steer," + direction.name()+"\nok";
 
     }
 
@@ -66,7 +64,7 @@ public class Mower {
 
         for (int k = 0; k < 8; k++) {
 
-            if (isValid(coordinate.x + x[k], coordinate.y + y[k], squares.length)) {
+            if (isValid(coordinate.x + x[k], coordinate.y + y[k], squares.length, squares[0].length)) {
 
                 Point currentPoint = new Point(coordinate.x + x[k], coordinate.y + y[k]);
                 if (otherMowers.contains(currentPoint)) {
@@ -84,43 +82,31 @@ public class Mower {
 
     }
 
-
     public String Pass() {
         return mowerId + ",pass \nok";
-    }
-
-    public void Cut() {
-
-
-    }
-
-    public void Display() {
-        System.out.println("Cut: " + countCutGrass);
-    }
-
-
-    public void UpdateHasCrashed() {
-        hasCrashed = true;
-        mowerStatus = "crash";
-
-    }
-
-    private void AddToPreviousDirections() {
-        this.previousDirections.add(currentDirection);
-    }
-
-    private void UpdateCurrentDirection(Direction direction) {
-        AddToPreviousDirections();
-        this.currentDirection = direction;
     }
 
     public void IncrementCutGrassSquare() {
         this.countCutGrass++;
     }
 
-    private boolean isValid(int x, int y, int len) {
-        if (x < 0 || y < 0 || x >= len || y >= len)
-            return false;
-        return true;
+    public void Cut() {    }
+
+    public void Display() { System.out.println("Cut: " + countCutGrass); }
+
+    public void UpdateHasCrashed() {
+        hasCrashed = true;
+        mowerStatus = "crash";
     }
+
+    private boolean validateMove(String newSquareDetail) { return newSquareDetail == "fence" || newSquareDetail == "mower" || newSquareDetail == "crater"; }
+
+    private void AddToPreviousDirections() { this.previousDirections.add(currentDirection); }
+
+    private void UpdateCurrentDirection(Direction direction) {
+        AddToPreviousDirections();
+        this.currentDirection = direction;
+    }
+
+    public boolean isValid(int x, int y, int width, int height) { return x >= 0 && y >= 0 && x < width && y < height; }
 }

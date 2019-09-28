@@ -1,7 +1,5 @@
 package enums;
 
-import com.sun.org.apache.xerces.internal.xs.StringList;
-
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,22 +1,30 @@
 package entities;
 
+
 import enums.Direction;
 import enums.Strategy;
 import lombok.Data;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
+import static enums.Direction.*;
 
 @Data
 public class SimulationRun {
+
     public int maxTurns;
     public List<String> fileInformation;
     public Lawn lawn;
     public int countTurns = 0;
+    private static Random randGenerator;
+
 
     public SimulationRun(List<String> file) {
+
+        randGenerator = new Random();
         this.fileInformation = file;
         ProcessFileInformation();
         RunSimulation();
@@ -38,7 +46,7 @@ public class SimulationRun {
 
             String[] line = fileInformation.get(mower + 3).split(",");
             Mower newMower = new Mower("m" + mower, new Point(Integer.parseInt(line[0]), Integer.parseInt(line[1]))
-                    , Direction.valueOf(line[2]));
+                    , valueOf(line[2]));
             mowers.add(newMower);
             strategies.add(Strategy.get((line[3])));
         }
@@ -64,33 +72,36 @@ public class SimulationRun {
     }
 
     private void RunSimulation() {
+        boolean maxedTurns = MaxTurnsReached();
+        boolean allmowers = AllMowersCrashed();
+        boolean allgrasscut = AllGrassCut();
 
+        while (!AllMowersCrashed()) {
 
-        while (MaxTurnsReached() || AllMowersCrashed() || AllGrassCut()) {
+            if(MaxTurnsReached() || AllGrassCut()) {
+                break;
+            }
 
             for (int i = 0; i < lawn.mowers.size(); i++) {
-                UpdateTurnCounter();
-                //lawn.mowers.get(i).hasCrashed = true;
-                if (false) {
-                    //if(!lawn.mowers.get(i).hasCrashed) {
+
+                //if (!lawn.mowers.get(i).hasCrashed && !MaxTurnsReached() || !lawn.mowers.get(i).hasCrashed && !AllMowersCrashed() || !lawn.mowers.get(i).hasCrashed && !AllGrassCut()) {
+                if(!lawn.mowers.get(i).hasCrashed && !AllMowersCrashed()) {
+                    UpdateTurnCounter();
                     Strategy strat = lawn.strategies.get(i);
 
-
                     if (strat == Strategy.random) {
+                        RunRandomStrategy(i);
 
-                        //make a random move
-                        if (AllGrassCut() || MaxTurnsReached() || AllMowersCrashed()) {
-                            break;
-                        }
                     } else {
-
-                        //make a strategic move
-                        if (AllGrassCut() || MaxTurnsReached() || AllMowersCrashed()) {
-                            break;
-                        }
 
                     }
                 }
+                else {
+                    UpdateTurnCounter();
+
+                }
+
+
             }
 
 
@@ -101,24 +112,186 @@ public class SimulationRun {
 
     }
 
+    public void RunMyStrategy(int mowerID) {
+
+        //TODO use a greedy algorithm
+
+        //greedy is  - make a move if it is valid to cut
+        //else determine closest grass sqaure and make a valid move towards it.
+
+    }
+
+
     public void RunRandomStrategy(int mowerID) {
 
+        int moveRandomChoice = randGenerator.nextInt(100);
+        Mower myMower = lawn.mowers.get(mowerID);
+        if (moveRandomChoice < 10) {
+
+            System.out.println(myMower.Pass());
+
+        } else if (moveRandomChoice < 35) {
+
+            Scan(mowerID);
+
+        } else if (moveRandomChoice < 60) {
+
+            Steer(myMower);
+
+        } else {
+
+            Move(myMower);
+        }
 
     }
 
+    private void Steer(Mower mower) {
 
-    public void RunMyStrategy(int mowerID) {
+        Direction newDirection;
+
+        newDirection = RandomDirection();
+
+        while (newDirection == mower.currentDirection) {
+            newDirection = RandomDirection();
+        }
+
+        System.out.println(mower.Steer(newDirection));
+
     }
 
+    private void Scan(int mowerID) {
+        List<Point> mowerPoints = new ArrayList<Point>();
+        for (Mower currentMower : lawn.mowers) {
 
-    //turn is an action  (move, steer, scan, pass)
+            if (!currentMower.hasCrashed) {
+                mowerPoints.add(currentMower.coordinate);
+            }
+        }
+        System.out.println(lawn.mowers.get(mowerID).Scan(lawn.squares, mowerPoints));
+    }
+
+    private void Move(Mower mower) {
+
+        Point newCoordinate = new Point();
+        newCoordinate = DetermineNewPoint(mower.coordinate, mower.currentDirection);
+
+        //only do this for valid cells
+        if (mower.isValid(newCoordinate.x,newCoordinate.y,lawn.width,lawn.height)) {
+
+            System.out.println(mower.Move(newCoordinate, lawn.squares[newCoordinate.x][newCoordinate.y].description));
+
+            UpdateState(newCoordinate);
+        }
+        else {
+            System.out.println(mower.Move(newCoordinate, "fence"));
+
+        }
+    }
+
+    private void UpdateState(Point updatePoint) {
+
+        String oldSquareDetail = lawn.squares[updatePoint.x][updatePoint.y].description;
+
+        switch (oldSquareDetail) {
+            case "empty": {
+                lawn.squares[updatePoint.x][updatePoint.y] = new Empty(updatePoint);
+                break;
+            }
+            case "grass": {
+                lawn.squares[updatePoint.x][updatePoint.y] = new Empty(updatePoint);
+                break;
+            }
+            case "mower": {
+                //wreckage
+                for (int i = 0; i < lawn.mowers.size(); i++) {
+
+                    if (lawn.mowers.get(i).coordinate.equals(updatePoint)) {
+
+                        if (!lawn.mowers.get(i).hasCrashed) {
+                            lawn.mowers.get(i).hasCrashed = true;
+                            System.out.println(lawn.mowers.get(i).mowerId + "\ncrashed");
+                        }
+                    }
+                }
+                lawn.squares[updatePoint.x][updatePoint.y] = new Empty(updatePoint);
+                break;
+            }
+            default:
+                System.out.println("unknown");
+                break;
+
+        }
+
+    }
+
+    private Point DetermineNewPoint(Point oldPoint, Direction currentDirection) {
+
+        Point newPoint = new Point();
+
+        switch (currentDirection) {
+
+            case north: {
+                newPoint.x = oldPoint.x;
+                newPoint.y = oldPoint.y + 1;
+                break;
+            }
+            case northeast: {
+                newPoint.x = oldPoint.x + 1;
+                newPoint.y = oldPoint.y + 1;
+                break;
+            }
+            case east: {
+                newPoint.x = oldPoint.x + 1;
+                newPoint.y = oldPoint.y;
+                break;
+            }
+            case southeast: {
+                newPoint.x = oldPoint.x + 1;
+                newPoint.y = oldPoint.y - 1;
+                break;
+            }
+            case south: {
+                newPoint.x = oldPoint.x;
+                newPoint.y = oldPoint.y - 1;
+                break;
+            }
+            case southwest: {
+                newPoint.x = oldPoint.x - 1;
+                newPoint.y = oldPoint.y - 1;
+                break;
+            }
+            case west: {
+                newPoint.x = oldPoint.x - 1;
+                newPoint.y = oldPoint.y;
+                break;
+            }
+            case northwest: {
+                newPoint.x = oldPoint.x - 1;
+                newPoint.y = oldPoint.y + 1;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+        return newPoint;
+
+    }
+
     private void UpdateTurnCounter() {
         countTurns++;
     }
 
-
     private boolean AllMowersCrashed() {
-        return lawn.crashedMowerCounter == lawn.mowers.size();
+        int crashCounter = 0;
+        for(Mower mower: lawn.mowers) {
+            if(mower.hasCrashed) {
+                crashCounter++;
+            }
+        }
+
+        return crashCounter == lawn.mowers.size();
     }
 
     private boolean MaxTurnsReached() {
@@ -129,7 +302,7 @@ public class SimulationRun {
         return lawn.CountAllGrassCut();
     }
 
-    public void HaltSimulationRun() {
+    private void HaltSimulationRun() {
 
         int currentCutSquares = 0;
 
@@ -140,6 +313,5 @@ public class SimulationRun {
         report.Display();
 
     }
-
 
 }

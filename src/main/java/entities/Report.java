@@ -1,6 +1,6 @@
 package entities;
 
-import lombok.Data;
+        import lombok.Data;
 
 @Data
 public class Report {
@@ -19,7 +19,7 @@ public class Report {
     }
 
     public void Display() {
-        System.out.println(areaOfLawn + "," + numberOfOriginalGrassSquares + ", " + numberOfCutGrassSquares + "," + numberOfCompletedTurns);
+        System.out.println(areaOfLawn + "," + numberOfOriginalGrassSquares + "," + numberOfCutGrassSquares + "," + numberOfCompletedTurns);
     }
 
 }

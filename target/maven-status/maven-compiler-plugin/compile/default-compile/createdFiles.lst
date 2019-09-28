@@ -3,6 +3,7 @@ entities\Crater.class
 entities\Empty.class
 entities\Mower.class
 action\PassAction.class
+entities\SimulationRun$1.class
 entities\Grass.class
 entities\Location.class
 entities\Square.class

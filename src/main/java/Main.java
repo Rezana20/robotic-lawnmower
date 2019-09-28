@@ -26,11 +26,9 @@ public class Main {
         }
 
 
-        //list.forEach(System.out::println);
-
         SimulationRun simulationRun = new SimulationRun(list);
 
-        System.out.println("SimulationRun Details");
+       /* System.out.println("SimulationRun Details");
 
         simulationRun.lawn.DisplayStateInformationOfSquares();
 
@@ -52,7 +50,7 @@ public class Main {
         //move to 1,2
 
         //System.out.println(simulationRun.lawn.mowers.get(0).Move(new Point(1,2),"mower"));
-        System.out.println(simulationRun.lawn.MowerTakeAction(0, "move", new Point(1, 2)));
+        //System.out.println(simulationRun.lawn.MowerTakeAction(0, "move", new Point(1, 2)));
 
         System.out.println("SimulationRun Details");
 
@@ -71,6 +69,9 @@ public class Main {
         //Evaluate action
         String actionOutcome = new MapUtils().evaluateAction(simulationRun, proposedAction);
         // System.out.println(actionOutcome);
+
+        */
+
 
 
     }

@@ -86,39 +86,6 @@ public class Lawn {
         }
     }
 
-    //TODO add more details here to make a move - may do this on simulation
-    public String MowerTakeAction(int MowerID, String mowerAction, Point newPoint) {
-
-        switch (mowerAction) {
-            case "move": {
-                String response = mowers.get(MowerID).Move(newPoint, "grass");
-                if (mowers.get(MowerID).hasCrashed) {
-                    crashedMowerCounter++;
-                } else {
-                    squares[newPoint.x][newPoint.y] = new Empty(newPoint);
-                }
-                return response;
-            }
-            case "steer": {
-                return mowers.get(MowerID).Steer(Direction.east);
-
-            }
-            case "pass": {
-                return mowers.get(MowerID).Pass();
-
-            }
-            case "scan": {
-                return mowers.get(MowerID).Scan(null, null);
-
-            }
-            default:
-                return "invalid option";
-
-        }
-
-
-    }
-
     public int Area() {
         return this.height * this.width;
     }
