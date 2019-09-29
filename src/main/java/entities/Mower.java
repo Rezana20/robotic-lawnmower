@@ -18,7 +18,7 @@ public class Mower {
     public Point coordinate;
     public boolean hasCrashed = false;
     public Direction currentDirection;
-    public int countCutGrass = 0;
+    public int countCutGrass = 1;
     public Point startCoordinate;
     public List<Direction> previousDirections;
     private String mowerStatus = "ok";
@@ -68,17 +68,17 @@ public class Mower {
 
                 Point currentPoint = new Point(coordinate.x + x[k], coordinate.y + y[k]);
                 if (otherMowers.contains(currentPoint)) {
-                    neighbors += "mower, ";
+                    neighbors += "mower,";
                 } else {
-                    neighbors += squares[coordinate.x + x[k]][coordinate.y + y[k]].toString() + ", ";
+                    neighbors += squares[coordinate.x + x[k]][coordinate.y + y[k]].toString() + ",";
                 }
 
             } else {
-                neighbors += "fence, ";
+                neighbors += "fence,";
             }
         }
 
-        return mowerId + ",scan \n" + neighbors.substring(0, neighbors.length() - 2);
+        return mowerId + ",scan \n" + neighbors.substring(0, neighbors.length() - 1);
 
     }
 

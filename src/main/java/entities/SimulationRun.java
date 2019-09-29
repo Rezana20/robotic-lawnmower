@@ -20,6 +20,7 @@ public class SimulationRun {
     public Lawn lawn;
     public int countTurns = 0;
     private static Random randGenerator;
+    private Point[] ClosestGrassToMower;
 
 
     public SimulationRun(List<String> file) {
@@ -27,6 +28,8 @@ public class SimulationRun {
         randGenerator = new Random();
         this.fileInformation = file;
         ProcessFileInformation();
+
+        ClosestGrassToMower = new Point[lawn.mowers.size()];
         RunSimulation();
 
 
@@ -72,20 +75,12 @@ public class SimulationRun {
     }
 
     private void RunSimulation() {
-        boolean maxedTurns = MaxTurnsReached();
-        boolean allmowers = AllMowersCrashed();
-        boolean allgrasscut = AllGrassCut();
 
-        while (!AllMowersCrashed()) {
-
-            if(MaxTurnsReached() || AllGrassCut()) {
-                break;
-            }
+        while (!AllMowersCrashed() || !MaxTurnsReached() || !AllGrassCut()) {
 
             for (int i = 0; i < lawn.mowers.size(); i++) {
 
-                //if (!lawn.mowers.get(i).hasCrashed && !MaxTurnsReached() || !lawn.mowers.get(i).hasCrashed && !AllMowersCrashed() || !lawn.mowers.get(i).hasCrashed && !AllGrassCut()) {
-                if(!lawn.mowers.get(i).hasCrashed && !AllMowersCrashed()) {
+                if (!lawn.mowers.get(i).hasCrashed && !AllMowersCrashed()) {
                     UpdateTurnCounter();
                     Strategy strat = lawn.strategies.get(i);
 
@@ -93,36 +88,106 @@ public class SimulationRun {
                         RunRandomStrategy(i);
 
                     } else {
-
+                        RunMyStrategy(i);
                     }
-                }
-                else {
+                } else {
                     UpdateTurnCounter();
 
                 }
 
+                if (MaxTurnsReached() || AllGrassCut() || AllMowersCrashed()) {
+                    break;
+                }
 
             }
 
-
+            if (MaxTurnsReached() || AllGrassCut() || AllMowersCrashed()) {
+                break;
+            }
         }
 
+
         HaltSimulationRun();
-
-
     }
 
     public void RunMyStrategy(int mowerID) {
 
-        //TODO use a greedy algorithm
+        Mower mower = lawn.mowers.get(mowerID);
 
-        //greedy is  - make a move if it is valid to cut
-        //else determine closest grass sqaure and make a valid move towards it.
+        List<Point> grassPoints = new ArrayList<Point>();
+        for (int x = 0; x < lawn.width; x++) {
+            for (int y = 0; y < lawn.height; y++) {
+
+                if (lawn.squares[x][y].toString().equals("grass")) {
+                    grassPoints.add(new Point(x, y));
+                }
+            }
+        }
+
+        GetClosestGrass(mowerID, mower, grassPoints);
+
+        Point closestGrass = ClosestGrassToMower[mowerID];
+        Direction dir = IsMowerInCorrectDirection(closestGrass, mower);
+        if (dir.equals(mower.currentDirection)) {
+            Move(mower);
+        } else {
+            System.out.println(mower.Steer(dir));
+        }
 
     }
 
+    private Direction IsMowerInCorrectDirection(Point targetPoint, Mower mower) {
+        Direction currentDirection = mower.currentDirection;
 
-    public void RunRandomStrategy(int mowerID) {
+        if (targetPoint.x == mower.coordinate.x && targetPoint.y > mower.coordinate.y) {
+            currentDirection = north;
+        } else if (targetPoint.x == mower.coordinate.x && targetPoint.y < mower.coordinate.y) {
+            currentDirection = south;
+        } else if (targetPoint.x < mower.coordinate.x && targetPoint.y == mower.coordinate.y) {
+            currentDirection = west;
+        } else if (targetPoint.x > mower.coordinate.x && targetPoint.y == mower.coordinate.y) {
+            currentDirection = east;
+        } else if (targetPoint.x > mower.coordinate.x && targetPoint.y < mower.coordinate.y) {
+            currentDirection = southwest;
+        } else if (targetPoint.x > mower.coordinate.x && targetPoint.y > mower.coordinate.y) {
+            currentDirection = northwest;
+        } else if (targetPoint.x > mower.coordinate.x && targetPoint.y > mower.coordinate.y) {
+            currentDirection = northeast;
+        } else if (targetPoint.x > mower.coordinate.x && targetPoint.y < mower.coordinate.y) {
+            currentDirection = southeast;
+        }
+
+        return currentDirection;
+
+    }
+
+    private void GetClosestGrass(int id, Mower mower, List<Point> grassPoints) {
+
+        Point minPoint = new Point();
+        int i1 = mower.coordinate.x;
+        int j1 = mower.coordinate.y;
+
+        int minDistance = lawn.height * lawn.width;
+
+        for (Point grassPoint : grassPoints) {
+
+            int distance = Math.abs(i1 - grassPoint.x) + Math.abs(j1 - grassPoint.y);
+            minDistance = Math.min(distance, minDistance);
+
+            if (minDistance == distance) {
+
+                minPoint.x = grassPoint.x;
+                minPoint.y = grassPoint.y;
+
+                ClosestGrassToMower[id] = minPoint;
+            }
+
+        }
+
+
+    }
+
+    private void RunRandomStrategy(int mowerID) {
 
         int moveRandomChoice = randGenerator.nextInt(100);
         Mower myMower = lawn.mowers.get(mowerID);
@@ -132,7 +197,7 @@ public class SimulationRun {
 
         } else if (moveRandomChoice < 35) {
 
-            Scan(mowerID);
+            Scan(myMower);
 
         } else if (moveRandomChoice < 60) {
 
@@ -159,7 +224,8 @@ public class SimulationRun {
 
     }
 
-    private void Scan(int mowerID) {
+    private void Scan(Mower mower) {
+
         List<Point> mowerPoints = new ArrayList<Point>();
         for (Mower currentMower : lawn.mowers) {
 
@@ -167,7 +233,7 @@ public class SimulationRun {
                 mowerPoints.add(currentMower.coordinate);
             }
         }
-        System.out.println(lawn.mowers.get(mowerID).Scan(lawn.squares, mowerPoints));
+        System.out.println(mower.Scan(lawn.squares, mowerPoints));
     }
 
     private void Move(Mower mower) {
@@ -176,13 +242,12 @@ public class SimulationRun {
         newCoordinate = DetermineNewPoint(mower.coordinate, mower.currentDirection);
 
         //only do this for valid cells
-        if (mower.isValid(newCoordinate.x,newCoordinate.y,lawn.width,lawn.height)) {
+        if (mower.isValid(newCoordinate.x, newCoordinate.y, lawn.width, lawn.height)) {
 
-            System.out.println(mower.Move(newCoordinate, lawn.squares[newCoordinate.x][newCoordinate.y].description));
+            System.out.println(mower.Move(newCoordinate, lawn.squares[newCoordinate.x][newCoordinate.y].toString()));
 
             UpdateState(newCoordinate);
-        }
-        else {
+        } else {
             System.out.println(mower.Move(newCoordinate, "fence"));
 
         }
@@ -190,11 +255,13 @@ public class SimulationRun {
 
     private void UpdateState(Point updatePoint) {
 
-        String oldSquareDetail = lawn.squares[updatePoint.x][updatePoint.y].description;
+        String oldSquareDetail = lawn.squares[updatePoint.x][updatePoint.y].toString();
 
         switch (oldSquareDetail) {
+            case "crater": {
+                break;
+            }
             case "empty": {
-                lawn.squares[updatePoint.x][updatePoint.y] = new Empty(updatePoint);
                 break;
             }
             case "grass": {
@@ -217,6 +284,7 @@ public class SimulationRun {
                 break;
             }
             default:
+                System.out.println(oldSquareDetail);
                 System.out.println("unknown");
                 break;
 
@@ -285,8 +353,8 @@ public class SimulationRun {
 
     private boolean AllMowersCrashed() {
         int crashCounter = 0;
-        for(Mower mower: lawn.mowers) {
-            if(mower.hasCrashed) {
+        for (Mower mower : lawn.mowers) {
+            if (mower.hasCrashed) {
                 crashCounter++;
             }
         }

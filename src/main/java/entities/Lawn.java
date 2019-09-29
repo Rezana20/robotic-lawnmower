@@ -1,7 +1,5 @@
 package entities;
 
-
-import enums.Direction;
 import enums.Strategy;
 import lombok.Data;
 
@@ -18,9 +16,6 @@ public class Lawn {
     public List<Crater> craters;
     public List<Strategy> strategies;
     public int totalGrassSquares = 0;
-    public boolean allGrassCut;
-    public int crashedMowerCounter = 0;
-
 
     public Lawn(int height, int width, List<Mower> mowers, List<Crater> craters, List<Strategy> strategies) {
         this.height = height;
@@ -59,9 +54,10 @@ public class Lawn {
 
 
         }
+        totalGrassSquares = totalGrassSquares + mowers.size();
     }
 
-    public void DisplayStateInformationOfSquares() {
+    public void GetStateInformationOfSquares() {
 
         for (int j = height - 1; j >= 0; --j) {
 
@@ -90,10 +86,6 @@ public class Lawn {
         return this.height * this.width;
     }
 
-    public void MarkGrassAsCut(int MowerID) {
-        mowers.get(MowerID).IncrementCutGrassSquare();
-    }
-
     public boolean CountAllGrassCut() {
         int currentCutSquares = 0;
 
@@ -103,6 +95,5 @@ public class Lawn {
 
         return currentCutSquares == totalGrassSquares;
     }
-
 
 }

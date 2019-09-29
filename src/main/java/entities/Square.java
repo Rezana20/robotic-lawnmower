@@ -7,10 +7,6 @@ public class Square {
     public Point coordinate;
     public String description = "square";
 
-    public Square() {
-
-    }
-
     public Square(Point coordinate) {
         this.coordinate = coordinate;
     }
